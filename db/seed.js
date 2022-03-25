@@ -1,7 +1,11 @@
 // inside db/seed.js
 
 // grab our client with destructuring from the export in index.js
-const { client, getAllUsers, createUser } = require('./index');
+const {
+  client,
+  getAllUsers,
+  createUser
+} = require('./index');
 
 
 async function dropTables() {
@@ -27,7 +31,10 @@ async function createTables() {
       CREATE TABLE users (
         id SERIAL PRIMARY KEY,
         username varchar(255) UNIQUE NOT NULL,
-        password varchar(255) NOT NULL
+        password varchar(255) NOT NULL,
+        name VARCHAR(255) NOT NULL,
+        location VARCHAR(255) NOT NULL,
+        active BOOLEAN DEFAULT true
       );
     `);
 
@@ -37,15 +44,25 @@ async function createTables() {
     throw error;
   }
 }
+
+
 async function createInitialUsers() {
   try {
     console.log("Starting to create users...");
 
-    const albert = await createUser({ username: 'albert', password: 'bertie99' });
-
-  
-    console.log("Finished creating users!");
-  } catch(error) {
+    const albert = await createUser({
+      username: 'albert',
+      password: 'bertie99',
+      name: 'Albert',
+      location: 'Santa Fe'
+    });
+    const lacey = await createUser({
+      username: 'lacey',
+      password: 'lace1337',
+      name: 'Lacey',
+      location: 'NYC'
+    });
+  } catch (error) {
     console.error("Error creating users!");
     throw error;
   }
