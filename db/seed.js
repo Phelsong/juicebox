@@ -1,12 +1,7 @@
 // inside db/seed.js
 
 // grab our client with destructuring from the export in index.js
-const {
-  client,
-  getAllUsers,
-  createUser
-} = require('./index');
-
+const { client, getAllUsers, createUser, updateUser } = require("./index");
 
 async function dropTables() {
   try {
@@ -45,22 +40,21 @@ async function createTables() {
   }
 }
 
-
 async function createInitialUsers() {
   try {
     console.log("Starting to create users...");
 
     const albert = await createUser({
-      username: 'albert',
-      password: 'bertie99',
-      name: 'Albert',
-      location: 'Santa Fe'
+      username: "albert",
+      password: "bertie99",
+      name: "Albert",
+      location: "Santa Fe",
     });
     const lacey = await createUser({
-      username: 'lacey',
-      password: 'lace1337',
-      name: 'Lacey',
-      location: 'NYC'
+      username: "lacey",
+      password: "lace1337",
+      name: "Lacey",
+      location: "NYC",
     });
   } catch (error) {
     console.error("Error creating users!");
@@ -80,13 +74,20 @@ async function rebuildDB() {
   }
 }
 
-
 async function testDB() {
   try {
     console.log("Starting to test database...");
 
+    console.log("Calling getAllUsers")
     const users = await getAllUsers();
-    console.log("getAllUsers:", users);
+    console.log("Result:", users);
+
+    console.log("Calling updateUser on users[0]")
+    const updateUserResult = await updateUser(users[0].id, {
+      name: "Newname Sogood",
+      location: "Lesterville, KY"
+    });
+    console.log("Result:", updateUserResult);
 
     console.log("Finished database tests!");
   } catch (error) {
@@ -94,7 +95,6 @@ async function testDB() {
     throw error;
   }
 }
-
 
 rebuildDB()
   .then(testDB)
