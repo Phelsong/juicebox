@@ -3,7 +3,7 @@ const LOGIN = process.env.DB_login;
 
 // inside db/index.js
 const { Client } = require("pg"); // imports the pg module
-const { rows } = require("pg/lib/defaults");
+const { rows, password, user } = require("pg/lib/defaults");
 
 // supply the db name and location of the database
 const client = new Client(`postgres://${LOGIN}@localhost:5432/juicebox-dev`);
@@ -37,8 +37,7 @@ async function createUser({ username, password, name, location }) {
 }
 
 async function updateUser(id, fields = {}) {
-
-  // id = 1 
+  // id = 1
 
   const setString = Object.keys(fields)
     .map((key, index) => `"${key}"=$${index + 1}`)
@@ -48,57 +47,87 @@ async function updateUser(id, fields = {}) {
   if (setString.length === 0) {
     return;
   }
-  
-   
-    
+
   try {
-    const { rows : [user]} = await client.query(`
+    const {
+      rows: [user],
+    } = await client.query(
+      `
       UPDATE users
       SET ${setString}
       WHERE id= ${id}
       RETURNING *;
-    `, Object.values(fields));
+    `,
+      Object.values(fields)
+    );
 
-// const {rows} = result
-// console.log (rows)
-console.log(user, 'my user var')
+    // const {rows} = result
+    // console.log (rows)
+    console.log(user, "my user var");
     return user;
   } catch (error) {
     throw error;
   }
 }
 
-async function createPost({
-  authorId,
-  title,
-  content
-}) {
+async function createPost({ authorId, title, content }) {
+  
   try {
+    const { rows } = await client.query(
+      `
+      INSERT INTO posts ( "authorId",
+        title,
+        content) 
+      VALUES($1, $2, $3) 
+      ON CONFLICT (title) DO NOTHING 
+      RETURNING *;
+    `,
+      [authorId, title, content]
+    );
 
+    return rows;
   } catch (error) {
     throw error;
   }
 }
-async function updatePost(id, {
-  title,
-  content,
-  active
-}) {
+
+async function updatePost(id, { title, content, active }) {
+  
+  const setString = Object.keys(fields)
+  .map((key, index) => `"${key}"=$${index + 1}`)
+  .join(", ");
+  
   try {
-
-  } catch (error) {
-    throw error;
-  }
-}
-
-async function getAllPosts() {
-  try {
-
-  } catch (error) {
-    throw error;
-  }
-}
-async function getPostsByUser(userId) {
+    const { rows } = await client.query(
+      `
+      INSERT INTO posts ( content,
+        title,
+        active) 
+        VALUES($1, $2, $3) 
+        ON CONFLICT (title) DO NOTHING 
+        RETURNING *;
+        `,
+        [content, title, active]
+        );
+      }
+      catch (error) {
+        throw error;
+      }
+    }
+  
+    
+  
+  async function getAllPosts() {
+      const {rows : posts} = await client.query (
+      `SELECT * FROM posts`
+      )
+      return posts 
+       
+    }
+        
+       
+       
+ async function getPostsByUser(userId) {
   try {
     const { rows } = client.query(`
       SELECT * FROM posts
@@ -109,14 +138,34 @@ async function getPostsByUser(userId) {
   } catch (error) {
     throw error;
   }
-}
-async function getUserById(userId) {
-  // first get the user (NOTE: Remember the query returns 
-    // (1) an object that contains 
-    // (2) a `rows` array that (in this case) will contain 
-    // (3) one object, which is our user.
-  // if it doesn't exist (if there are no `rows` or `rows.length`), return null
+ }
 
+async function getUserById(userId) {
+
+const {rows} = client.query(`
+  SELECT * FROM posts
+  WHERE userId =${ userId };
+  `)
+
+  try {
+    const { rows } = client.query(`
+      SELECT * FROM posts
+      WHERE "authorId"=${ userId };
+    `);
+
+    return rows;
+  } catch (error) {
+    throw error;
+  }
+  
+
+  
+  
+  // first get the user (NOTE: Remember the query returns
+  // (1) an object that contains
+  // (2) a `rows` array that (in this case) will contain
+  // (3) one object, which is our user.
+  // if it doesn't exist (if there are no `rows` or `rows.length`), return null
   // if it does:
   // delete the 'password' key from the returned object
   // get their posts (use getPostsByUser)
