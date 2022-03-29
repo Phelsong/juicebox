@@ -77,18 +77,23 @@ async function createTables() {
 async function createInitialUsers() {
   try {
     console.log("Starting to create users...");
-
-    const albert = await createUser({
-      username: "albert",
-      password: "bertie99",
-      name: "Albert",
-      location: "Santa Fe",
+    await createUser({ 
+      username: 'albert', 
+      password: 'bertie99',
+      name: 'Al Bert',
+      location: 'Sidney, Australia' 
     });
-    const lacey = await createUser({
-      username: "lacey",
-      password: "lace1337",
-      name: "Lacey",
-      location: "NYC",
+    await createUser({ 
+      username: 'sandra', 
+      password: '2sandy4me',
+      name: 'Just Sandra',
+      location: 'Ain\'t tellin\''
+    });
+    await createUser({ 
+      username: 'glamgal',
+      password: 'soglam',
+      name: 'Joshua',
+      location: 'Upper East Side'
     });
   } catch (error) {
     console.error("Error creating users!");
@@ -103,6 +108,18 @@ async function createInitialPosts() {
       authorId: albert.id,
       title: "First Post",
       content: "This is my first post. I hope I love writing blogs as much as I love writing them."
+    });
+
+    await createPost({
+      authorId: sandra.id,
+      title: "How does this work?",
+      content: "Seriously, does this even do anything?"
+    });
+
+    await createPost({
+      authorId: glamgal.id,
+      title: "Living the Glam Life",
+      content: "Do you even? I swear that half of you are posing."
     });
 
     // a couple more
@@ -122,7 +139,7 @@ async function createInitialTags() {
     ]);
 
     const [postOne, postTwo, postThree] = await getAllPosts();
-
+    console.log (postOne, postTwo, postThree);
     await addTagsToPost(postOne.id, [happy, inspo]);
     await addTagsToPost(postTwo.id, [sad, inspo]);
     await addTagsToPost(postThree.id, [happy, catman, inspo]);

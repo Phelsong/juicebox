@@ -7,7 +7,7 @@ const { rows, password, user } = require("pg/lib/defaults");
 
 // supply the db name and location of the database
 const client = new Client(`postgres://${LOGIN}@localhost:5432/juicebox-dev`);
-
+ // -------------------------------- 
 async function getAllUsers() {
   const { rows } = await client.query(
     `SELECT id, username, password, name, location
@@ -17,7 +17,7 @@ async function getAllUsers() {
 
   return rows;
 }
-
+ // -------------------------------- 
 async function createUser({ username, password, name, location }) {
   try {
     const { rows } = await client.query(
@@ -35,7 +35,7 @@ async function createUser({ username, password, name, location }) {
     throw error;
   }
 }
-
+ // -------------------------------- 
 async function updateUser(id, fields = {}) {
   // id = 1
 
@@ -66,7 +66,7 @@ async function updateUser(id, fields = {}) {
     throw error;
   }
 }
-
+ // -------------------------------- 
 async function createPost({ authorId, title, content }) {
   
   try {
@@ -86,7 +86,7 @@ async function createPost({ authorId, title, content }) {
     throw error;
   }
 }
-
+ // -------------------------------- 
 async function updatePost(id, fields = { }) {
   
   const setString = Object.keys(fields).map((key, contentQuery) => `"${key}"=$${contentQuery + 1}`).join(", ");
@@ -114,7 +114,7 @@ if (setString.length === 0) {
     }
   
     
-  
+ // -------------------------------- 
   async function getAllPosts() {
       const {rows : posts} = await client.query (
       `SELECT * FROM posts`
@@ -124,22 +124,27 @@ if (setString.length === 0) {
     }
         
        
-       
+// ----------------------------------   
  async function getPostsByUser(userId) {
   try {
-    const { rows } = await client.query(`
-      SELECT * FROM posts
+    const { rows : postIds } = await client.query(`
+      SELECT id
+      FROM posts
       WHERE "authorId"=${ userId };
     `);
 
-    return rows;
+    const posts = await Promise.all(postIds.map(
+      post => getPostById( post.id )
+    ));
+
+    return posts;
   } catch (error) {
     throw error;
   }
  }
+// -----------------------------------------
 
 async function getUserById(userId) {
-
 
   try {
     const { rows : [user] } = await client.query(`
@@ -157,13 +162,12 @@ return user
   } catch (error) { return null;}
 
 }
-
-
+ // --------------------------------*********** --------------
 async function createTags (tagList) {
   if (tagList.length === 0) { 
     return; 
   }
-console.log(tagList)
+
   // need something like: $1), ($2), ($3 
   const insertValues = tagList.map(
     (_, index) => `$${index + 1}`).join('), (');
@@ -172,34 +176,28 @@ console.log(tagList)
   // need something like $1, $2, $3
   const selectValues = tagList.map(
     (_, index) => `$${index + 1}`).join(', ');
-  // then we can use (${ selectValues }) in our string template
 
-  const tagValues = tagList.map(
-    (value, index) => `${value}`).join(', ');
-console.log (tagValues);
-
-  // try {
-    const {rows} = await client.query(`
+  try {
+    await client.query(`
     INSERT INTO tags(name)
-    VALUES ${insertValues}
+    VALUES (${insertValues})
     ON CONFLICT (name) DO NOTHING;
 `, tagList
 );
 
-    const { rows : tags } = await client.query(`
+    const { rows } = await client.query(`
     SELECT * FROM tags
     WHERE name
-    IN ${selectValues}
-  `)
+    IN (${selectValues})
+  `, tagList
+  )
   
-  return tags
-  // } catch (error) {
-  //   throw error;
-  // }
+  return rows
+  } catch (error) {
+    throw error;
+  }
 }
-
-
-
+ // ------------------------------*************---------------------- 
 async function createPostTag(postId, tagId) {
   try {
     await client.query(`
@@ -211,7 +209,7 @@ async function createPostTag(postId, tagId) {
     throw error;
   }
 }
-
+//-------------------------------- ********----------------
 async function addTagsToPost(postId, tagList) {
   try {
     const createPostTagPromises = tagList.map(
@@ -224,7 +222,7 @@ async function addTagsToPost(postId, tagList) {
   } catch (error) {
     throw error;
   }}
-
+ // -------------------------------- ----------------------
   async function getPostById(postId) {
     try {
       const { rows: [ post ]  } = await client.query(`
@@ -257,7 +255,7 @@ async function addTagsToPost(postId, tagList) {
     }
   }
 
-
+ // -------------------------------- 
 
 
 
