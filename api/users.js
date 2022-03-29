@@ -1,5 +1,6 @@
 const express = require('express');
 const usersRouter = express.Router();
+const { getAllUsers } = require('../db');
 
 usersRouter.use((req, res, next) => {
   console.log("A request is being made to /users");
@@ -7,9 +8,11 @@ usersRouter.use((req, res, next) => {
   next(); 
 });
 
-usersRouter.get('/', (req, res) => {
+usersRouter.get('/', async (req, res) => {
+  const users = await getAllUsers();
+
   res.send({
-    users: []
+    users
   });
 });
 

@@ -8,6 +8,9 @@ server.use(morgana('dev'));
 
 server.use(express.json())
 
+const { client } = require('./db');
+client.connect();
+
 server.listen(PORT, () => {
   console.log('The server is up on port', PORT)
 });
@@ -23,12 +26,13 @@ server.use((req, res, next) => {
     next();
   });
 //--
-app.use('/api', (req, res, next) => {
-    console.log("A request was made to /api");
-    next();
-  });
-//---
-app.get('/api', (req, res, next) => {
-    console.log("A get request was made to /api");
-    res.send({ message: "success" });
-});
+// app.use('/api', (req, res, next) => {
+//     console.log("A request was made to /api");
+//     next();
+//   });
+// //---
+// app.get('/api', (req, res, next) => {
+//     console.log("A get request was made to /api");
+//     res.send({ message: "success" });
+// });
+

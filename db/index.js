@@ -8,7 +8,8 @@ const { rows, password, user } = require("pg/lib/defaults");
 // supply the db name and location of the database
 const client = new Client(`postgres://${LOGIN}@localhost:5432/juicebox-dev`);
  // -------------------------------- 
-async function getAllUsers() {
+
+ async function getAllUsers(){
   const { rows } = await client.query(
     `SELECT id, username, password, name, location
     FROM users;
@@ -17,7 +18,19 @@ async function getAllUsers() {
 
   return rows;
 }
+
  // -------------------------------- 
+ async function getAllTags(){
+  const { rows } = await client.query(
+    `SELECT  name
+    FROM tags;
+  `
+  );
+
+  return rows;
+}
+ // --------------------------------
+
 async function createUser({ username, password, name, location }) {
   try {
     const { rows } = await client.query(
@@ -317,6 +330,7 @@ async function addTagsToPost(postId, tagList) {
 
 module.exports = {
   client,
+  getAllTags,
   getAllUsers,
   createUser,
   updateUser,
