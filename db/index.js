@@ -4,10 +4,14 @@ const LOGIN = process.env.DB_login;
 // inside db/index.js
 const { Client } = require("pg"); // imports the pg module
 const { rows, password, user } = require("pg/lib/defaults");
-
+//----------------------------------------------------------------
 // supply the db name and location of the database
 const client = new Client(`postgres://${LOGIN}@localhost:5432/juicebox-dev`);
- // -------------------------------- 
+
+
+
+
+// -------------------------------- 
 
  async function getAllUsers(){
   const { rows } = await client.query(
@@ -80,6 +84,38 @@ async function updateUser(id, fields = {}) {
   }
 }
  // -------------------------------- 
+
+ async function getUserByUsername(username) {
+  try {
+    const { rows: [user] } = await client.query(`
+      SELECT *
+      FROM users
+      WHERE username=$1;
+    `, [username]);
+
+    return user;
+  } catch (error) {
+    throw error;
+  }
+}
+
+
+//----------------------------------------------------------------
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 async function createPost({ authorId, title, content, tags = []}) {
   
   try {
@@ -342,5 +378,6 @@ module.exports = {
   createTags,
   createPostTag,
   addTagsToPost,
-  getPostsByTagName
+  getPostsByTagName,
+  getUserByUsername
 };

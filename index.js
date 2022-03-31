@@ -5,15 +5,28 @@ const apiRouter = require('./api');
 server.use('/api', apiRouter);
 const morgana = require('morgan');
 server.use(morgana('dev'));
-
 server.use(express.json())
-
 const { client } = require('./db');
+const jwt = require('jsonwebtoken');
+
+
 client.connect();
 
 server.listen(PORT, () => {
   console.log('The server is up on port', PORT)
 });
+
+//--------------
+
+//------------------
+
+
+
+
+
+
+
+
 
 
 //four parameter needs error, request, response and next, in that order
