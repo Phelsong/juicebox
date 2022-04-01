@@ -3,8 +3,10 @@ const apiRouter = express.Router();
 const postsRouter = require('./posts');
 const tagsRouter =require('./tags');
 const usersRouter = require('./users');
-require('dotenv').config();
 const { getUserById } = require('../db');
+const {requireUser} = require('./utils');
+
+
 //----------------------------------------------------------------
 const jwt = require('jsonwebtoken');
 const {JWT_SECRET } = process.env
@@ -62,7 +64,9 @@ apiRouter.use((error, req, res, next) => {
   });
 
 
+  // Router.post('/some/route', requireUser, async (req, res, next) => {
 
+  // });
 
 
 

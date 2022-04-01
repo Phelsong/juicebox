@@ -103,19 +103,6 @@ async function updateUser(id, fields = {}) {
 //----------------------------------------------------------------
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
 async function createPost({ authorId, title, content, tags = []}) {
   
   try {
@@ -138,7 +125,8 @@ async function createPost({ authorId, title, content, tags = []}) {
   }
 }
  // -------------------------------- ------------------------
-async function updatePost(postId, fields = { }) {
+
+ async function updatePost(postId, fields = { }) {
   
 // read off the tags & remove that field 
 const { tags } = fields; // might be undefined
